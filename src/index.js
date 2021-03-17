@@ -1,13 +1,33 @@
 #!/usr/bin/env node
+
+// Imports
 const { exec } = require('child_process')
 const path = require('path')
 const chalk = require('chalk')
 
+// * PROGRAM START *
+
+// 1. CHECK FOR PROJECT NAME
+
+const projectName = process.argv.slice(2).join('-')
+
+if (projectName) createProject(projectName)
+else
+	logError(
+		'Please provide a project name:\n\tcreate-node-project [directory] [project-name]',
+	)
+
 // FUNCTIONS
 
-const log = console.log
-const logError = (message) => log(chalk.bold.red(message))
-const execLog = (message) => log(chalk.yellow(message))
+function log() {
+	return console.log
+}
+function logError(message) {
+	log(chalk.bold.red(message))
+}
+function execLog(message) {
+	log(chalk.yellow(message))
+}
 
 function shell(command, options = {}) {
 	let verboseMode
@@ -30,6 +50,7 @@ function shell(command, options = {}) {
 async function createProject(projectName) {
 	async function cloneRepo() {
 		const workingDirectory = path.resolve(__dirname, '../..')
+		const projectDirectory = path.resolve(projectName)
 		return await shell(
 			`gh repo clone mattdanielmurphy/create-node-project ${projectName}`,
 			{ cwd: workingDirectory },
@@ -37,13 +58,8 @@ async function createProject(projectName) {
 	}
 
 	function removeInstallerFiles() {
-		const installerFiles = [
-			'package.json',
-			'yarn.lock',
-			'index.js',
-			'readme.md',
-		]
-		return `rm ${installerFiles.join(' ')}`
+		const installerFiles = ['src', 'package.json', 'yarn.lock', 'readme.md']
+		return `rm -r ${installerFiles.join(' ')}`
 	}
 
 	async function executeShellCommands(arrayOfCommands) {
@@ -99,15 +115,3 @@ async function createProject(projectName) {
 
 	executeShellCommands(commands)
 }
-
-// * PROGRAM START *
-
-// 1. CHECK FOR PROJECT NAME
-
-const projectName = process.argv.slice(2).join('-')
-
-if (projectName) createProject(projectName)
-else
-	error(
-		'Please provide a project name:\n\tcreate-node-project [directory] [project-name]',
-	)

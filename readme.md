@@ -2,6 +2,10 @@
 
 A tool I created for myself to create new node projects.
 
+## usage
+
+`create-node-project [project | project-directory]`
+
 ### Features
 
 - configs:
@@ -31,3 +35,16 @@ Include:
 ## requirements
 
 - github-cli `npm i -g gh`
+
+## to do
+
+- use typescript
+- use cli framework
+- fix using a dot as project/dir name
+- add tests! (will make it easier for below)
+- make it so you can do the following `create-node-project { directory | project-name }` with:
+  - subdirectory that matches project-name
+  - `.`, setting project-name to that of parent dir
+  - project-name, creating a project dir with that name
+  - make project dir follow naming convention: `Project Name`
+- add testing to new projects (jest)
