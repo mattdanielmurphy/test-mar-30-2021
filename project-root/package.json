@@ -5,10 +5,15 @@
 	"repository": "git@github.com:mattdanielmurphy/create-node-project.git",
 	"author": "Matthew Daniel Murphy <matt@mattmurphy.ca>",
 	"license": "MIT",
-	"dependencies": {},
+	"dependencies": {
+		"chalk": "^4.1.0"
+	},
 	"bin": "src/index.js",
 	"scripts": {
-		"dev": "cd ../; rm -rf test-create-node-project; tsc 'Create Node Project/src/index.ts'; node 'Create Node Project/src/index.js' test-create-node-project",
+		"dev": "cd ~/Projects; rm -rf test-create-node-project; create-node-project test-create-node-project",
+		"compile-typescript": "tsc src/index.ts",
+		"make-js-file-executable": "begin; echo '#!/usr/bin/env node'; cat test.txt; end | sponge test.txt",
+		"compile": "yarn compile-typescript; yarn make-js-file-executable",
 		"lint": "eslint . --ext .ts"
 	},
 	"devDependencies": {
