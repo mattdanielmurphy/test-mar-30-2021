@@ -38,7 +38,6 @@ Include:
 
 ## to do
 
-- use typescript
 - use cli framework
 - fix using a dot as project/dir name
 - add tests! (will make it easier for below)
@@ -48,3 +47,6 @@ Include:
   - project-name, creating a project dir with that name
   - make project dir follow naming convention: `Project Name`
 - add testing to new projects (jest)
+- add support for errors:
+  - github repo already exists -> create new name?
+- add option for use `code` or `code-insiders` or `open` folder
