@@ -1,19 +1,13 @@
 {
-	"name": "create-node-project",
-	"version": "0.0.2",
+	"name": "project-name",
+	"version": "0.0.1",
 	"main": "index.js",
-	"repository": "git@github.com:mattdanielmurphy/create-node-project.git",
+	"repository": "git@github.com:mattdanielmurphy/project-name.git",
 	"author": "Matthew Daniel Murphy <matt@mattmurphy.ca>",
 	"license": "MIT",
-	"dependencies": {
-		"chalk": "^4.1.0"
-	},
+	"dependencies": {},
 	"bin": "src/index.js",
 	"scripts": {
-		"dev": "cd ~/Projects; rm -rf test-create-node-project; create-node-project test-create-node-project",
-		"compile-typescript": "tsc src/index.ts",
-		"make-js-file-executable": "begin; echo '#!/usr/bin/env node'; cat test.txt; end | sponge test.txt",
-		"compile": "yarn compile-typescript; yarn make-js-file-executable",
 		"lint": "eslint . --ext .ts"
 	},
 	"devDependencies": {

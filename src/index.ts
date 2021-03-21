@@ -1,3 +1,4 @@
+import * as editJsonFile from 'edit-json-file'
 import * as path from 'path'
 
 import { exec } from 'child_process'
@@ -39,32 +40,24 @@ async function shellCommand(command, options?: Options) {
 }
 
 async function createProject(projectName) {
+	const workingDirectory = path.resolve(__dirname, '../..')
+	const projectDirectory = path.resolve(workingDirectory, projectName)
 	async function executeShellCommands(arrayOfCommands, options?: Options) {
 		options = options || {}
 		for (let i = 0; i < arrayOfCommands.length; i++) {
-			const { message, command, fn, verboseMode } = arrayOfCommands[i]
+			const { message, command, options, fn } = arrayOfCommands[i]
 
 			console.log(`[${i + 1}/${arrayOfCommands.length}] ${message}...`) // [1/7] Cloning Repo...
 
-			const projectDirectory = path.resolve(__dirname, '../..', projectName)
-
 			if (fn) {
-				await fn()
+				fn()
 			} else {
 				await shellCommand(command, {
 					cwd: projectDirectory,
-					verboseMode: options.verboseMode || verboseMode,
+					...options,
 				})
 			}
 		}
-	}
-
-	async function cloneRepo() {
-		const workingDirectory = path.resolve(__dirname, '../..')
-		await shellCommand(
-			`gh repo clone mattdanielmurphy/create-node-project ${projectName}`,
-			{ cwd: workingDirectory },
-		)
 	}
 
 	function getRemoveInstallerFilesCommand() {
@@ -75,13 +68,29 @@ async function createProject(projectName) {
 	const commands = [
 		{
 			message: `Cloning repo into folder '${projectName}'`,
-			fn: cloneRepo,
+			command: `gh repo clone mattdanielmurphy/create-node-project ${projectName}`,
+			options: { cwd: workingDirectory },
 		},
 		{
 			message: 'Removing installer files',
 			command: getRemoveInstallerFilesCommand(),
 		},
-		// { message: 'Moving root files', command: 'mv project-root/* .; rm -r project-root' },
+		{
+			message: 'Moving root files',
+			command: 'mv project-root/* .; rm -r project-root',
+		},
+		{
+			message: 'Updating project name in package.json',
+			fn: () => {
+				const file = editJsonFile(path.join(projectDirectory, 'package.json'))
+				file.set('name', projectName)
+				file.set(
+					'repository',
+					`git@github.com:mattdanielmurphy/${projectName}.git`,
+				)
+				file.save()
+			},
+		},
 		{
 			message: 'Creating readme',
 			command: `touch readme.md; echo "# ${projectName}" >> readme.md`,

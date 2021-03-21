@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -36,6 +47,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
+var editJsonFile = require("edit-json-file");
 var path = require("path");
 var child_process_1 = require("child_process");
 // * PROGRAM START
@@ -70,7 +82,7 @@ function createProject(projectName) {
     return __awaiter(this, void 0, void 0, function () {
         function executeShellCommands(arrayOfCommands, options) {
             return __awaiter(this, void 0, void 0, function () {
-                var i, _a, message, command, fn, verboseMode, projectDirectory;
+                var i, _a, message, command, options_1, fn;
                 return __generator(this, function (_b) {
                     switch (_b.label) {
                         case 0:
@@ -78,41 +90,20 @@ function createProject(projectName) {
                             i = 0;
                             _b.label = 1;
                         case 1:
-                            if (!(i < arrayOfCommands.length)) return [3 /*break*/, 6];
-                            _a = arrayOfCommands[i], message = _a.message, command = _a.command, fn = _a.fn, verboseMode = _a.verboseMode;
+                            if (!(i < arrayOfCommands.length)) return [3 /*break*/, 5];
+                            _a = arrayOfCommands[i], message = _a.message, command = _a.command, options_1 = _a.options, fn = _a.fn;
                             console.log("[" + (i + 1) + "/" + arrayOfCommands.length + "] " + message + "..."); // [1/7] Cloning Repo...
-                            projectDirectory = path.resolve(__dirname, '../..', projectName);
-                            if (!fn) return [3 /*break*/, 3];
-                            return [4 /*yield*/, fn()];
-                        case 2:
+                            if (!fn) return [3 /*break*/, 2];
+                            fn();
+                            return [3 /*break*/, 4];
+                        case 2: return [4 /*yield*/, shellCommand(command, __assign({ cwd: projectDirectory }, options_1))];
+                        case 3:
                             _b.sent();
-                            return [3 /*break*/, 5];
-                        case 3: return [4 /*yield*/, shellCommand(command, {
-                                cwd: projectDirectory,
-                                verboseMode: options.verboseMode || verboseMode
-                            })];
+                            _b.label = 4;
                         case 4:
-                            _b.sent();
-                            _b.label = 5;
-                        case 5:
                             i++;
                             return [3 /*break*/, 1];
-                        case 6: return [2 /*return*/];
-                    }
-                });
-            });
-        }
-        function cloneRepo() {
-            return __awaiter(this, void 0, void 0, function () {
-                var workingDirectory;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            workingDirectory = path.resolve(__dirname, '../..');
-                            return [4 /*yield*/, shellCommand("gh repo clone mattdanielmurphy/create-node-project " + projectName, { cwd: workingDirectory })];
-                        case 1:
-                            _a.sent();
-                            return [2 /*return*/];
+                        case 5: return [2 /*return*/];
                     }
                 });
             });
@@ -121,18 +112,33 @@ function createProject(projectName) {
             var installerFiles = ['src', 'package.json', 'yarn.lock', 'readme.md'];
             return "rm -r " + installerFiles.join(' ');
         }
-        var commands;
+        var workingDirectory, projectDirectory, commands;
         return __generator(this, function (_a) {
+            workingDirectory = path.resolve(__dirname, '../..');
+            projectDirectory = path.resolve(workingDirectory, projectName);
             commands = [
                 {
                     message: "Cloning repo into folder '" + projectName + "'",
-                    fn: cloneRepo
+                    command: "gh repo clone mattdanielmurphy/create-node-project " + projectName,
+                    options: { cwd: workingDirectory }
                 },
                 {
                     message: 'Removing installer files',
                     command: getRemoveInstallerFilesCommand()
                 },
-                // { message: 'Moving root files', command: 'mv project-root/* .; rm -r project-root' },
+                {
+                    message: 'Moving root files',
+                    command: 'mv project-root/* .; rm -r project-root'
+                },
+                {
+                    message: 'Updating project name in package.json',
+                    fn: function () {
+                        var file = editJsonFile(path.join(projectDirectory, 'package.json'));
+                        file.set('name', projectName);
+                        file.set('repository', "git@github.com:mattdanielmurphy/" + projectName + ".git");
+                        file.save();
+                    }
+                },
                 {
                     message: 'Creating readme',
                     command: "touch readme.md; echo \"# " + projectName + "\" >> readme.md"
