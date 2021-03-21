@@ -5,19 +5,45 @@
 	"repository": "git@github.com:mattdanielmurphy/create-node-project.git",
 	"author": "Matthew Daniel Murphy <matt@mattmurphy.ca>",
 	"license": "MIT",
-	"dependencies": {},
-	"bin": "src/index.js",
+	"bin": "index.js",
 	"scripts": {
-		"dev": "cd ~/Projects; rm -rf test-create-node-project; tsc 'Create Node Project/src/index.ts'; node 'Create Node Project/src/index.js' test-create-node-project",
+		"dev": "cd ~/Projects; rm -rf test-create-node-project; create-node-project test-create-node-project",
 		"lint": "eslint . --ext .ts"
+	},
+	"dependencies": {
+		"edit-json-file": "^1.6.0",
+		"eslint": "^7.22.0"
 	},
 	"devDependencies": {
 		"@tsconfig/node14": "^1.0.0",
+		"@types/edit-json-file": "^1.4.0",
 		"@types/node": "^14.14.35",
 		"@typescript-eslint/eslint-plugin": "^4.18.0",
 		"@typescript-eslint/parser": "^4.18.0",
-		"edit-json-file": "^1.6.0",
-		"eslint": "^7.22.0",
 		"typescript": "^4.2.3"
-	}
+	},
+	"prettier": {
+		"singleQuote": true,
+		"jsxSingleQuote": true,
+		"semi": false,
+		"trailingComma": "all",
+		"useTabs": true
+	},
+	"eslintConfig": {
+		"root": true,
+		"parser": "@typescript-eslint/parser",
+		"plugins": [
+			"@typescript-eslint"
+		],
+		"extends": [
+			"eslint:recommended",
+			"plugin:@typescript-eslint/eslint-recommended",
+			"plugin:@typescript-eslint/recommended"
+		]
+	},
+	"eslintIgnore": [
+		"node_modules",
+		"node_modules.nosync",
+		"dist"
+	]
 }
