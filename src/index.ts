@@ -1,11 +1,8 @@
-import * as editJsonFile from 'edit-json-file'
+import editJsonFile = require('edit-json-file')
+
 import * as path from 'path'
 
 import { exec } from 'child_process'
-
-// * PROGRAM START
-
-// 1. CHECK FOR PROJECT NAME
 
 const projectName = process.argv.slice(2).join('-')
 
@@ -15,53 +12,83 @@ else
 		'Please provide a project name:\n\tcreate-node-project [directory] [project-name]',
 	)
 
-// FUNCTIONS
+// * - - - - - - - - - - - - - - - -
+// * FUNCTIONS
+// * - - - - - - - - - - - - - - - -
 
 interface Options {
 	[key: string]: unknown
 }
 
-async function shellCommand(command, options?: Options) {
+async function shellCommand(command: string, options?: Options) {
 	options = options || {}
 
-	let verboseMode
+	let verboseMode: boolean
 	if (options.verboseMode) {
 		delete options.verboseMode
 		verboseMode = true
 	}
 
-	return new Promise((resolve) => {
-		exec(command, options, (error, stdout, stderr) => {
-			if (error || stderr) console.error(error, stderr)
-			if (verboseMode && stdout) console.log(stdout)
-			resolve(stdout ? stdout : stderr)
-		})
+	return new Promise((resolve, reject) => {
+		exec(
+			command,
+			options,
+			(
+				error: Error | null,
+				stdout: string | Buffer,
+				stderr: string | Buffer,
+			) => {
+				if (error) {
+					console.log(error)
+					reject(error)
+				}
+				if (verboseMode && stdout) console.log(stdout)
+				resolve(stdout ? stdout : stderr)
+			},
+		)
 	})
 }
 
-async function createProject(projectName) {
+async function createProject(projectName: string) {
 	const workingDirectory = path.resolve(__dirname, '../..')
 	const projectDirectory = path.resolve(workingDirectory, projectName)
-	async function executeShellCommands(arrayOfCommands, options?: Options) {
-		options = options || {}
-		for (let i = 0; i < arrayOfCommands.length; i++) {
-			const { message, command, options, fn } = arrayOfCommands[i]
+	async function executeShellCommands(
+		commands: {
+			message: string
+			command?: string
+			fn?(): void
+			options?: Options
+		}[],
+		options?: Options,
+	) {
+		const optionsForAllCommands = options || {}
+		let lastCommandFailed = false
 
-			console.log(`[${i + 1}/${arrayOfCommands.length}] ${message}...`) // [1/7] Cloning Repo...
+		for (let i = 0; i < commands.length; i++) {
+			const { message, command, options = {}, fn } = commands[i]
+			Object.assign(options, optionsForAllCommands)
 
+			if (lastCommandFailed) return
+
+			console.log(`[${i + 1}/${commands.length}] ${message}...`) // [1/7] Cloning Repo...
 			if (fn) {
-				fn()
+				try {
+					fn()
+				} catch (error) {
+					console.log(error)
+					lastCommandFailed = true
+				}
 			} else {
-				await shellCommand(command, {
+				await shellCommand(command || '', {
 					cwd: projectDirectory,
 					...options,
-				})
+				}).catch(() => (lastCommandFailed = true))
 			}
 		}
 	}
 
 	function getRemoveInstallerFilesCommand() {
-		const installerFiles = ['src', 'package.json', 'yarn.lock', 'readme.md']
+		const installerFiles = ['src']
 		return `rm -r ${installerFiles.join(' ')}`
 	}
 
@@ -76,14 +103,11 @@ async function createProject(projectName) {
 			command: getRemoveInstallerFilesCommand(),
 		},
 		{
-			message: 'Moving root files',
-			command: 'mv project-root/* .; rm -r project-root',
-		},
-		{
-			message: 'Updating project name in package.json',
+			message: 'Updating package.json',
 			fn: () => {
 				const file = editJsonFile(path.join(projectDirectory, 'package.json'))
 				file.set('name', projectName)
+				file.set('version', '0.0.1')
 				file.set(
 					'repository',
 					`git@github.com:mattdanielmurphy/${projectName}.git`,
@@ -92,34 +116,29 @@ async function createProject(projectName) {
 			},
 		},
 		{
-			message: 'Creating readme',
-			command: `touch readme.md; echo "# ${projectName}" >> readme.md`,
+			message: 'Updating readme',
+			command: `echo "# ${projectName}" > readme.md`,
 		},
-		{ message: 'Removing remote origin', command: 'git remote remove origin' },
 		{
 			message: 'Creating GitHub repo',
-			command: `gh repo create ${projectName} -y --public`,
+			command: `git remote remove origin; gh repo create ${projectName} -y --public`,
 		},
-		{ message: 'Initializing yarn project', command: 'yarn init -y' },
 		{
 			message: 'Pushing first commit',
 			command:
 				'git add .; git commit -m "initial commit"; git push -u origin main',
 		},
 		{
-			message: 'Making node_modules.nosync',
+			message: 'Installing packages', // and do node_modules.nosync trick
 			command:
-				'mkdir node_modules.nosync; ln -s node_modules.nosync node_modules',
+				'mkdir node_modules.nosync; ln -s node_modules.nosync node_modules; yarn',
 		},
 		{
-			message: 'Installing packages',
-			command: 'yarn',
-		},
-		{
-			message: 'Opening project folder in VS Code',
-			command: 'code .',
+			message: 'Opening project folder in Visual Studio Code',
+			command: 'code-insiders .',
 		},
 	]
 
+	console.log('All done!')
 	executeShellCommands(commands)
 }
