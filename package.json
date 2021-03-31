@@ -1,49 +1,49 @@
 {
-	"name": "create-node-project",
-	"version": "0.0.2",
-	"main": "index.js",
-	"repository": "git@github.com:mattdanielmurphy/create-node-project.git",
-	"author": "Matthew Daniel Murphy <matt@mattmurphy.ca>",
-	"license": "MIT",
-	"bin": "index.js",
-	"scripts": {
-		"dev": "cd ~/Projects; rm -rf test-create-node-project; create-node-project test-create-node-project",
-		"lint": "eslint . --ext .ts"
-	},
-	"dependencies": {
-		"edit-json-file": "^1.6.0",
-		"eslint": "^7.22.0"
-	},
-	"devDependencies": {
-		"@tsconfig/node14": "^1.0.0",
-		"@types/edit-json-file": "^1.4.0",
-		"@types/node": "^14.14.35",
-		"@typescript-eslint/eslint-plugin": "^4.18.0",
-		"@typescript-eslint/parser": "^4.18.0",
-		"typescript": "^4.2.3"
-	},
-	"prettier": {
-		"singleQuote": true,
-		"jsxSingleQuote": true,
-		"semi": false,
-		"trailingComma": "all",
-		"useTabs": true
-	},
-	"eslintConfig": {
-		"root": true,
-		"parser": "@typescript-eslint/parser",
-		"plugins": [
-			"@typescript-eslint"
-		],
-		"extends": [
-			"eslint:recommended",
-			"plugin:@typescript-eslint/eslint-recommended",
-			"plugin:@typescript-eslint/recommended"
-		]
-	},
-	"eslintIgnore": [
-		"node_modules",
-		"node_modules.nosync",
-		"dist"
-	]
+  "name": "test-mar-30-2021",
+  "version": "0.0.1",
+  "main": "index.js",
+  "repository": "git@github.com:mattdanielmurphy/test-mar-30-2021.git",
+  "author": "Matthew Daniel Murphy <matt@mattmurphy.ca>",
+  "license": "MIT",
+  "bin": "index.js",
+  "scripts": {
+    "dev": "cd ~/Projects; rm -rf test-create-node-project; create-node-project test-create-node-project",
+    "lint": "eslint . --ext .ts"
+  },
+  "dependencies": {
+    "edit-json-file": "^1.6.0",
+    "eslint": "^7.22.0"
+  },
+  "devDependencies": {
+    "@tsconfig/node14": "^1.0.0",
+    "@types/edit-json-file": "^1.4.0",
+    "@types/node": "^14.14.35",
+    "@typescript-eslint/eslint-plugin": "^4.18.0",
+    "@typescript-eslint/parser": "^4.18.0",
+    "typescript": "^4.2.3"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "jsxSingleQuote": true,
+    "semi": false,
+    "trailingComma": "all",
+    "useTabs": true
+  },
+  "eslintConfig": {
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+      "@typescript-eslint"
+    ],
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/eslint-recommended",
+      "plugin:@typescript-eslint/recommended"
+    ]
+  },
+  "eslintIgnore": [
+    "node_modules",
+    "node_modules.nosync",
+    "dist"
+  ]
 }
